@@ -48,7 +48,7 @@ RUN corepack enable && corepack prepare pnpm@9.1.0 --activate
 COPY package.json pnpm-lock.yaml* ./
 
 # Install only production dependencies
-RUN pnpm install --prod --frozen-lockfile && pnpm store prune
+RUN pnpm install --production --frozen-lockfile --ignore-scripts
 
 # Copy built application from builder stage
 COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
