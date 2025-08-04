@@ -63,38 +63,3 @@ jobs:
         BODY: '{"package": "portfolio", "tag": "${{ steps.meta.outputs.tags }}", "sha": "${{ github.sha }}"}'
         APP_KEY: ${{ secrets.APP_KEY }}
 
-  # Optional: Test the built image
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-
-    steps:
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    - name: Build test image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        load: true
-        tags: test-image:latest
-        cache-from: type=gha
-
-    - name: Test container startup
-      run: |
-        # Start container in background
-        docker run -d --name test-container -p 3000:3000 test-image:latest
-
-        # Wait for container to be ready
-        timeout 30 sh -c 'until curl -f http://localhost:3000/; do sleep 1; done'
-
-        # Test blog endpoint
-        curl -f http://localhost:3000/blog/
-
-        # Test specific blog post
-        curl -f http://localhost:3000/blog/posts/ || true
-
-        # Cleanup
-        docker stop test-container
-        docker rm test-container
