@@ -36,7 +36,7 @@ RUN adduser -S nextjs -u 1001
 
 # Copy Next.js build output
 COPY --from=site-builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=site-builder --chown=nextjs:nodejs /app/public ./public
+# Public files are served by Next.js from .next build output
 COPY --from=site-builder --chown=nextjs:nodejs /app/package*.json ./
 COPY --from=site-builder --chown=nextjs:nodejs /app/yarn.lock ./
 COPY --from=site-builder --chown=nextjs:nodejs /app/node_modules ./node_modules
