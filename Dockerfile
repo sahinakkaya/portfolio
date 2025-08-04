@@ -2,24 +2,27 @@
 # Stage 1: Build Next.js site
 FROM node:18-alpine as site-builder
 
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@8.15.0 --activate
+
 # Set working directory
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-COPY yarn.lock ./
+COPY pnpm-lock.yaml* ./
 
 # Install all dependencies (needed for build)
-RUN yarn install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # Copy source code
 COPY . .
 
 # Build Next.js application
-RUN yarn build
+RUN pnpm run build
 
 # Remove dev dependencies after build
-RUN yarn install --production --frozen-lockfile
+RUN pnpm install --prod --frozen-lockfile
 
 # Stage 2: Production runtime
 FROM node:18-alpine
@@ -38,7 +41,7 @@ RUN adduser -S nextjs -u 1001
 COPY --from=site-builder --chown=nextjs:nodejs /app/.next ./.next
 # Public files are served by Next.js from .next build output
 COPY --from=site-builder --chown=nextjs:nodejs /app/package*.json ./
-COPY --from=site-builder --chown=nextjs:nodejs /app/yarn.lock ./
+COPY --from=site-builder --chown=nextjs:nodejs /app/pnpm-lock.yaml* ./
 COPY --from=site-builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 # Switch to non-root user
@@ -55,6 +58,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node healthcheck.js
 
+# Install pnpm in production stage
+RUN corepack enable && corepack prepare pnpm@8.15.0 --activate
+
 # Start the application
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["yarn", "start"]
+CMD ["pnpm", "start"]
