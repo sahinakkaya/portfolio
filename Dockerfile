@@ -1,66 +1,30 @@
-# Dockerfile for Next.js site
-# Stage 1: Build Next.js site
-FROM node:18-alpine as site-builder
+# Use the official Node.js image with Alpine Linux
+FROM node:20-alpine
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@8.15.0 --activate
-
-# Set working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-COPY pnpm-lock.yaml* ./
+# Copy package.json and pnpm-lock.yaml to the working directory
+COPY package.json pnpm-lock.yaml ./
 
-# Install all dependencies (needed for build)
+# Install pnpm and configure global directory
+RUN npm install -g pnpm && \
+    pnpm config set global-bin-dir /usr/local/bin
+
+# Install dependencies using pnpm
 RUN pnpm install --frozen-lockfile
 
-# Copy source code
+# Copy the rest of the application code
 COPY . .
 
-# Build Next.js application
-RUN pnpm run build
+# Build the application for production
+RUN pnpm build
 
-# Remove dev dependencies after build
-RUN pnpm install --prod --frozen-lockfile
+# Install `serve` globally to serve static files
+RUN pnpm add -g serve
 
-# Stage 2: Production runtime
-FROM node:18-alpine
-
-# Set working directory
-WORKDIR /app
-
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
-
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-
-# Copy Next.js build output
-COPY --from=site-builder --chown=nextjs:nodejs /app/.next ./.next
-# Public files are served by Next.js from .next build output
-COPY --from=site-builder --chown=nextjs:nodejs /app/package*.json ./
-COPY --from=site-builder --chown=nextjs:nodejs /app/pnpm-lock.yaml* ./
-COPY --from=site-builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-
-# Switch to non-root user
-USER nextjs
-
-# Expose port
+# Expose the port the app runs on (default for serve is 3000)
 EXPOSE 3000
 
-# Set environment to production
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node healthcheck.js
-
-# Install pnpm in production stage
-RUN corepack enable && corepack prepare pnpm@8.15.0 --activate
-
-# Start the application
-ENTRYPOINT ["dumb-init", "--"]
-CMD ["pnpm", "start"]
+# Command to serve the production build
+CMD ["serve", "-s", "dist"]
