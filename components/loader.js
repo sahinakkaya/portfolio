@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
 import PropTypes from 'prop-types';
 import anime from 'animejs';
 import styled from 'styled-components';
@@ -89,9 +88,6 @@ const Loader = ({ finishLoading }) => {
 
   return (
     <StyledLoader className="loader" $isMounted={isMounted}>
-      <Head>
-        <body className="hidden" />
-      </Head>
 
       <div className="logo-wrapper">
         <IconLoader />
