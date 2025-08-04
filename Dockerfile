@@ -51,7 +51,8 @@ COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install --production --frozen-lockfile --ignore-scripts
 
 # Copy built application from builder stage
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Set environment variables
@@ -71,4 +72,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 # Start the application
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["pnpm", "start"]
+CMD ["node", "server.js"]
