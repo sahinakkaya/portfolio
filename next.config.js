@@ -22,8 +22,8 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  // Output configuration
-  output: 'standalone',
+  // Output configuration - disabled for proper static file serving
+  // output: 'standalone',
 
   // Experimental features for better performance
   experimental: {

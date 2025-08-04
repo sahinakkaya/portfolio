@@ -24,14 +24,11 @@ RUN corepack enable && corepack prepare pnpm@9.1.0 --activate
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copy source code
+# Copy source code (including public directory)
 COPY . .
 
 # Build the application
 RUN pnpm build
-
-# Ensure public directory exists in builder
-RUN mkdir -p ./public
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner
@@ -54,10 +51,7 @@ COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install --production --frozen-lockfile --ignore-scripts
 
 # Copy built application from builder stage
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Copy public directory
+COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Set environment variables
@@ -77,4 +71,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 # Start the application
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "server.js"]
+CMD ["pnpm", "start"]
