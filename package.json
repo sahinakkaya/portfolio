@@ -18,7 +18,7 @@
     "prepare": "husky install",
     "lint-staged": "lint-staged"
   },
-  "packageManager": "pnpm@8.15.0",
+  "packageManager": "pnpm@9.1.0",
   "lint-staged": {
     "*.{js,css,json,md}": [
       "prettier --write"

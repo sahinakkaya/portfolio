@@ -1,19 +1,58 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  productionBrowserSourceMaps: true,
+  // Disable source maps in production for smaller build size
+  productionBrowserSourceMaps: false,
   reactStrictMode: true,
   swcMinify: true,
+
+  // Compiler optimizations
   compiler: {
     styledComponents: true,
+    removeConsole: process.env.NODE_ENV === 'production',
   },
+
+  // Image optimization
   images: {
+    formats: ['image/avif', 'image/webp'],
     domains: [],
   },
+
+  // Build optimizations
   eslint: {
-    // Disable ESLint during builds (for Docker)
     ignoreDuringBuilds: true,
   },
-  trailingSlash: true,
-}
 
-module.exports = nextConfig
+  // Output configuration
+  output: 'standalone',
+
+  // Experimental features for better performance
+  experimental: {
+    optimizeCss: true,
+  },
+
+  // Headers for better caching
+  async headers() {
+    return [
+      {
+        source: '/content/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  },
+};
+
+module.exports = nextConfig;

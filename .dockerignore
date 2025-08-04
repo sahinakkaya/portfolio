@@ -17,7 +17,8 @@ public/blog
 
 # Documentation
 README.md
-*.md
+# Keep content markdown files for build process
+# *.md
 
 # IDE
 .vscode
