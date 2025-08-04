@@ -30,6 +30,9 @@ COPY . .
 # Build the application
 RUN pnpm build
 
+# Ensure public directory exists in builder
+RUN mkdir -p ./public
+
 # Stage 3: Runner
 FROM node:20-alpine AS runner
 WORKDIR /app
@@ -53,6 +56,8 @@ RUN pnpm install --production --frozen-lockfile --ignore-scripts
 # Copy built application from builder stage
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Copy public directory
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Set environment variables
