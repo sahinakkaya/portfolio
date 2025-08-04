@@ -20,11 +20,8 @@ COPY . .
 # Build the application for production
 RUN pnpm build
 
-# Install `serve` globally to serve static files
-RUN pnpm add -g serve
-
-# Expose the port the app runs on (default for serve is 3000)
+# Expose the port the app runs on
 EXPOSE 3000
 
-# Command to serve the production build
-CMD ["serve", "-s", "dist"]
+# Command to start the Next.js application
+CMD ["pnpm", "start"]
