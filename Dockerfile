@@ -52,7 +52,7 @@ RUN pnpm install --production --frozen-lockfile --ignore-scripts
 
 # Copy built application from builder stage
 COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+# COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Set environment variables
 ENV NODE_ENV=production
