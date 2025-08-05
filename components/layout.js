@@ -16,7 +16,7 @@ const StyledContent = styled.div`
 const Layout = ({ children }) => {
   const router = useRouter();
   const isHome = router.pathname === '/';
-  const [isLoading, setIsLoading] = useState(isHome);
+  const [isLoading, setIsLoading] = useState(false); // Disabled loader - change back to 'isHome' to re-enable
 
   // Sets target="_blank" rel="noopener noreferrer" on external links
   const handleExternalLinks = () => {
