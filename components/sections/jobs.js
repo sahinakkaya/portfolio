@@ -85,7 +85,8 @@ const StyledTabButton = styled.button`
   }
   @media (max-width: 600px) {
     ${({ theme }) => theme.mixins.flexCenter};
-    min-width: 120px;
+    width: auto;
+    flex: 0 0 auto;
     padding: 0 15px;
     border-left: 0;
     border-bottom: 2px solid var(--lightest-navy);
@@ -108,17 +109,16 @@ const StyledHighlight = styled.div`
   border-radius: var(--border-radius);
   background: var(--green);
   transform: translateY(calc(${({ $activeTabId }) => $activeTabId} * var(--tab-height)));
-  transition: transform 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
+  transition: transform 0.25s cubic-bezier(0.645, 0.045, 0.355, 1), width 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
   transition-delay: 0.1s;
 
   @media (max-width: 600px) {
     top: auto;
     bottom: 0;
-    width: 100%;
-    max-width: var(--tab-width);
+    width: ${({ $activeTabWidth }) => $activeTabWidth || '120px'};
     height: 2px;
     margin-left: 50px;
-    transform: translateX(calc(${({ $activeTabId }) => $activeTabId} * var(--tab-width)));
+    transform: translateX(${({ $activeTabLeft }) => $activeTabLeft || '0px'});
   }
   @media (max-width: 480px) {
     margin-left: 25px;
@@ -232,6 +232,8 @@ const Jobs = () => {
 
   const [activeTabId, setActiveTabId] = useState(0);
   const [tabFocus, setTabFocus] = useState(null);
+  const [activeTabWidth, setActiveTabWidth] = useState('120px');
+  const [activeTabLeft, setActiveTabLeft] = useState('0px');
   const tabs = useRef([]);
   const revealContainer = useRef(null);
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -261,6 +263,31 @@ const Jobs = () => {
 
   // Only re-run the effect if tabFocus changes
   useEffect(() => focusTab(), [tabFocus]);
+
+  // Update highlight dimensions when active tab changes
+  useEffect(() => {
+    const updateHighlight = () => {
+      const activeTab = tabs.current[activeTabId];
+      if (activeTab) {
+        setActiveTabWidth(`${activeTab.offsetWidth}px`);
+        // Calculate position relative to the tab list container, accounting for margins
+        let leftPosition = 0;
+        for (let i = 0; i < activeTabId; i++) {
+          if (tabs.current[i]) {
+            leftPosition += tabs.current[i].offsetWidth;
+          }
+        }
+        setActiveTabLeft(`${leftPosition}px`);
+      }
+    };
+
+    // Update immediately
+    updateHighlight();
+
+    // Update on window resize
+    window.addEventListener('resize', updateHighlight);
+    return () => window.removeEventListener('resize', updateHighlight);
+  }, [activeTabId]);
 
   // Focus on tabs when using up & down arrow keys
   const onKeyDown = e => {
@@ -307,7 +334,11 @@ const Jobs = () => {
                 </StyledTabButton>
               );
             })}
-          <StyledHighlight $activeTabId={activeTabId} />
+          <StyledHighlight 
+            $activeTabId={activeTabId} 
+            $activeTabWidth={activeTabWidth}
+            $activeTabLeft={activeTabLeft}
+          />
         </StyledTabList>
 
         <StyledTabPanels>
