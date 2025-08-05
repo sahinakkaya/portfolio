@@ -321,7 +321,6 @@ const GlobalStyle = createGlobalStyle`
   }
 
   a {
-    display: inline-block;
     text-decoration: none;
     text-decoration-skip-ink: auto;
     color: inherit;
@@ -587,7 +586,6 @@ const theme = {
 
     link: `
       color: var(--green);
-      display: inline-block;
       text-decoration: none;
       text-decoration-skip-ink: auto;
       position: relative;
@@ -601,7 +599,6 @@ const theme = {
     `,
 
     inlineLink: `
-      display: inline-block;
       position: relative;
       color: #64ffda;
       transition: all 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -619,7 +616,6 @@ const theme = {
         }
       }
       &:after {
-        content: '';
         display: block;
         width: 0;
         height: 1px;
