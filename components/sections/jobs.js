@@ -184,7 +184,7 @@ const jobsStaticData = [
         company: 'Ascenix Instruments',
         location: 'Istanbul, Turkey',
         range: 'Dec 2022 - Jan 2024',
-        url: '#'
+        url: 'https://www.ascenix.systems/'
       },
       html: `<ul><li>Developed frontend applications using React framework</li><li>Implemented a custom plugin for Moodle, a free open source learning platform</li><li>Managed deployment of the Moodle instance and ensured proper integration</li><li>Worked with PHP and Linux systems for backend integrations</li></ul>`
     }
@@ -196,7 +196,7 @@ const jobsStaticData = [
         company: 'BosphorusISS',
         location: 'Istanbul, Turkey',
         range: 'Apr 2022 - Jun 2022',
-        url: '#'
+        url: 'https://bosphorusiss.com/'
       },
       html: `<ul><li>Made a proof of concept work that demonstrates how to reduce load on servers by using shared memory</li><li>Worked on exposing CAN bus to Internet</li><li>Developed low-level C++ code for embedded systems</li></ul>`
     }
@@ -334,8 +334,8 @@ const Jobs = () => {
                 </StyledTabButton>
               );
             })}
-          <StyledHighlight 
-            $activeTabId={activeTabId} 
+          <StyledHighlight
+            $activeTabId={activeTabId}
             $activeTabWidth={activeTabWidth}
             $activeTabLeft={activeTabLeft}
           />
