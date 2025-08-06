@@ -9,7 +9,7 @@ images:
   - './target-settings.png'
   - './habit-settings.png'
 github: 'https://github.com/sahinakkaya/progress'
-external: null
+external: 'https://progress.sahinakkaya.dev'
 tech:
   - Go
   - React

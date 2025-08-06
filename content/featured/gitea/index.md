@@ -7,7 +7,7 @@ images:
   - './code-freq.png'
   - './recent-commits.png'
 github: 'https://github.com/go-gitea/gitea/pull/27882'
-external: 'https://github.com/go-gitea/gitea/pull/27882'
+external: null
 tech:
   - Go
   - Vue.js

@@ -364,8 +364,8 @@ const Featured = ({ featuredProjects }) => {
                         </a>
                       )}
                       {external && !cta && (
-                        <a href={external} aria-label="External Link" className="external">
-                          <Icon name="External" />
+                        <a href={external} aria-label="Try It Live" className="cta">
+                          Try It Live
                         </a>
                       )}
                     </div>
