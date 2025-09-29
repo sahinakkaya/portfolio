@@ -151,8 +151,8 @@ const About = () => {
 
             <p>
               I enjoy sharing my experiences and discoveries through my{' '}
-              <a href="https://sahinakkaya.dev" target="_blank" rel="noreferrer">personal blog</a>,
-              where I write about technical challenges and solutions I encounter. When I'm not coding, 
+              <a href="https://blog.sahinakkaya.dev" target="_blank" rel="noreferrer">personal blog</a>,
+              where I write about technical challenges and solutions I encounter. When I'm not coding,
               you may find me playing chess ♟️, working out 💪, or watching movies 🍿.
             </p>
 
