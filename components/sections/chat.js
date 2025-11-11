@@ -453,6 +453,11 @@ const Chat = () => {
     }
   };
 
+  // Don't render chat until connected
+  if (!connected) {
+    return null;
+  }
+
   return (
     <StyledChatContainer>
       <StyledInfoIcon>
