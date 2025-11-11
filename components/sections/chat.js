@@ -425,6 +425,13 @@ const Chat = () => {
     };
 
     initializeChat();
+
+    // Cleanup on unmount
+    return () => {
+      if (ws) {
+        ws.close();
+      }
+    };
   }, []);
 
   // Connect WebSocket when token is available
@@ -435,11 +442,6 @@ const Chat = () => {
     let retryTimeout = null;
 
     const connectWebSocket = () => {
-      // Close existing websocket if any (check for CONNECTING or OPEN state)
-      if (websocket && (websocket.readyState === WebSocket.CONNECTING || websocket.readyState === WebSocket.OPEN)) {
-        websocket.close();
-      }
-
       const fullUrl = `${chat.wsUrl}?token=${encodeURIComponent(
         token
       )}&userid=${encodeURIComponent(userId)}`;
@@ -520,7 +522,7 @@ const Chat = () => {
       if (retryTimeout) {
         clearTimeout(retryTimeout);
       }
-      if (websocket && (websocket.readyState === WebSocket.CONNECTING || websocket.readyState === WebSocket.OPEN)) {
+      if (websocket && websocket.readyState === WebSocket.OPEN) {
         websocket.close();
       }
     };
@@ -569,7 +571,7 @@ const Chat = () => {
 
   const handleRetry = () => {
     // Close existing connection if any
-    if (ws && (ws.readyState === WebSocket.CONNECTING || ws.readyState === WebSocket.OPEN)) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
       ws.close();
     }
     retryCountRef.current = 0;
