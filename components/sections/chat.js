@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
+import Typewriter from 'typewriter-effect';
 import { chat } from '../../lib/config';
 
 const StyledChatContainer = styled.div`
@@ -85,27 +86,23 @@ const StyledEmptyState = styled.div`
     }
   }
 
-  @keyframes blink {
-    0%, 50% {
-      opacity: 1;
-    }
-    51%, 100% {
-      opacity: 0;
-    }
-  }
-
-  &:before {
-    content: '${({ $isError }) => $isError ? '! ' : '$ '}';
+  .prompt {
     color: ${({ $isError, theme }) => $isError ? '#ff6464' : theme.colors.green};
     text-shadow: ${({ $isError, theme }) =>
       $isError ? '0 0 8px #ff6464' : `0 0 8px ${theme.colors.green}`};
+    margin-right: 8px;
   }
 
-  &:after {
-    content: '${({ $isError }) => $isError ? '' : '_'}';
+  .Typewriter {
+    display: inline;
+  }
+
+  .Typewriter__wrapper {
+    color: ${({ theme }) => theme.colors.slate};
+  }
+
+  .Typewriter__cursor {
     color: ${({ theme }) => theme.colors.green};
-    margin-left: 2px;
-    animation: ${({ $isError }) => $isError ? 'none' : 'blink 1s step-start infinite'};
   }
 `;
 
@@ -595,9 +592,23 @@ const Chat = () => {
       </StyledTooltip>
       <StyledMessagesArea ref={messagesAreaRef}>
         {errorMessage ? (
-          <StyledEmptyState $isError={true}>{errorMessage}</StyledEmptyState>
+          <StyledEmptyState $isError={true}>
+            <span className="prompt">!</span>
+            {errorMessage}
+          </StyledEmptyState>
         ) : messages.length === 0 && !isLoading ? (
-          <StyledEmptyState $isError={false}>{welcomeMessage}</StyledEmptyState>
+          <StyledEmptyState $isError={false}>
+            <span className="prompt">$</span>
+            <Typewriter
+              options={{
+                strings: [welcomeMessage],
+                autoStart: true,
+                loop: false,
+                delay: 50,
+                cursor: '_',
+              }}
+            />
+          </StyledEmptyState>
         ) : (
           messages.map((message) => (
             <StyledMessage
