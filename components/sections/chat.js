@@ -478,6 +478,10 @@ const Chat = () => {
   };
 
   const handleRetry = () => {
+    // Close existing connection if any
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.close();
+    }
     retryCountRef.current = 0;
     setConnectionFailed(false);
     if (connectWebSocketRef.current) {
