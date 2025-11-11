@@ -62,13 +62,13 @@ const StyledEmptyState = styled.div`
   height: 100%;
   color: ${({ $isError, theme }) => $isError ? '#ff6464' : theme.colors.slate};
   font-size: 13px;
-  animation: ${({ $isError }) => $isError ? 'none' : 'fadeInOut 6s ease-in-out'};
+  animation: ${({ $isError }) => $isError ? 'none' : 'fadeInOut 15s ease-in-out'};
 
   @keyframes fadeInOut {
     0% {
       opacity: 0;
     }
-    15%, 85% {
+    10%, 90% {
       opacity: 0.7;
     }
     100% {
@@ -386,7 +386,7 @@ const Chat = () => {
     if (messages.length === 0 && !isLoading && !errorMessage) {
       const timer = setInterval(() => {
         setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % welcomeMessages.length);
-      }, 6000); // Change message every 6 seconds
+      }, 15000); // Change message every 15 seconds
 
       return () => clearInterval(timer);
     }
