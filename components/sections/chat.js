@@ -30,6 +30,29 @@ const StyledMessagesArea = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+
+  /* Minimal scrollbar styling to match page scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(136, 146, 176, 0.3) transparent;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(136, 146, 176, 0.3);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(136, 146, 176, 0.5);
+  }
 `;
 
 const StyledEmptyState = styled.div`
@@ -226,7 +249,24 @@ const Chat = () => {
   const [token, setToken] = useState('');
   const [ws, setWs] = useState(null);
   const [connected, setConnected] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    { type: 'sent', content: 'Hello! How can I help you today?', id: 1 },
+    { type: 'received', content: 'Hi there! I can assist you with various questions. What would you like to know?', id: 2 },
+    { type: 'sent', content: 'Tell me about your latest project', id: 3 },
+    { type: 'received', content: 'I\'ve been working on several interesting projects lately. Would you like to hear about the web development work or the machine learning projects?', id: 4 },
+    { type: 'sent', content: 'The web development one sounds interesting', id: 5 },
+    { type: 'received', content: 'Great choice! I recently built a modern portfolio website using Next.js and React. It features a clean design with smooth animations and a custom chat interface.', id: 6 },
+    { type: 'sent', content: 'What technologies did you use?', id: 7 },
+    { type: 'received', content: 'The tech stack includes Next.js 13, React 18, Styled Components for styling, and WebSocket for real-time chat functionality. I also implemented server-side rendering for better performance.', id: 8 },
+    { type: 'sent', content: 'That sounds impressive! How long did it take?', id: 9 },
+    { type: 'received', content: 'The initial version took about 2-3 weeks of focused development. Since then, I\'ve been continuously improving and adding new features based on user feedback.', id: 10 },
+    { type: 'sent', content: 'What was the biggest challenge?', id: 11 },
+    { type: 'received', content: 'The most challenging part was implementing the real-time chat with proper authentication and handling edge cases like connection drops and reconnection logic.', id: 12 },
+    { type: 'sent', content: 'How did you solve it?', id: 13 },
+    { type: 'received', content: 'I implemented a robust WebSocket connection manager with automatic reconnection, token-based authentication, and proper error handling. The system now gracefully handles network interruptions.', id: 14 },
+    { type: 'sent', content: 'Nice work! Any other features planned?', id: 15 },
+    { type: 'received', content: 'Yes! I\'m planning to add message history persistence, typing indicators, and possibly integrate some AI capabilities for smarter responses.', id: 16 },
+  ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const messagesAreaRef = useRef(null);
