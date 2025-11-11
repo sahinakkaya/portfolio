@@ -5,14 +5,14 @@ import { chat } from '../../lib/config';
 const StyledChatSection = styled.section`
   max-width: 1000px;
   margin: 0 auto;
-  padding: 50px 0;
+  padding: 0 0 50px 0;
 
   @media (max-width: 768px) {
-    padding: 40px 0;
+    padding: 0 0 40px 0;
   }
 
   @media (max-width: 480px) {
-    padding: 30px 0;
+    padding: 0 0 30px 0;
   }
 `;
 
