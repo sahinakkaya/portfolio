@@ -354,9 +354,10 @@ const inputPlaceholders = [
 ];
 
 // TypewriterMessage component for animating chat responses
-const TypewriterMessage = ({ content }) => {
+const TypewriterMessage = ({ content, messageId }) => {
   return (
     <Typewriter
+      key={messageId}
       options={{
         strings: [content],
         autoStart: true,
@@ -636,7 +637,7 @@ const Chat = () => {
               </div>
               <div className="message-content">
                 {message.type === 'received' ? (
-                  <TypewriterMessage content={message.content} />
+                  <TypewriterMessage content={message.content} messageId={message.id} />
                 ) : (
                   message.content
                 )}
