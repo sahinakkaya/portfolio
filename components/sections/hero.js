@@ -115,17 +115,17 @@ const Hero = () => {
     <>
       {/* Desktop version with typewriter */}
       <h3 className="big-heading desktop-typewriter">
-        <span style={{marginRight: '0.3em'}}>I love</span>
+        <span style={{ marginRight: '0.3em' }}>I love</span>
         <Typewriter
           options={{
             strings: [
-              "creating solutions.",
-              "tinkering my system.",
-              "solving problems.",
-              "building useful things.",
-              "making life easier.",
-              "automating everything.",
-              "self-hosting.",
+              'creating solutions.',
+              'tinkering my system.',
+              'solving problems.',
+              'building useful things.',
+              'making life easier.',
+              'automating everything.',
+              'self-hosting.',
             ],
             autoStart: true,
             loop: true,
@@ -135,9 +135,7 @@ const Hero = () => {
         />
       </h3>
       {/* Mobile version with static text */}
-      <h3 className="big-heading mobile-static">
-        I love creating solutions.
-      </h3>
+      <h3 className="big-heading mobile-static">I love creating solutions.</h3>
     </>
   );
   const four = (
@@ -154,18 +152,14 @@ const Hero = () => {
         <a href="https://www.itu.edu.tr/en" target="_blank" rel="noreferrer">
           ITU
         </a>
-        . I'm passionate about free software, self-hosting, and building tools that make
-        people's lives easier. I have extensive experience in backend development with Python, FastAPI, and modern web technologies. Currently exploring opportunities in AI and seeking new challenges.
-
+        . I'm passionate about free software, self-hosting, and building tools that make people's
+        lives easier. I have extensive experience in backend development with Python, FastAPI, and
+        modern web technologies. Currently exploring opportunities in AI and seeking new challenges.
       </p>
     </>
   );
   const five = (
-    <a
-      className="email-link"
-      href="mailto:sahin@sahinakkaya.dev"
-      target="_blank"
-      rel="noreferrer">
+    <a className="email-link" href="mailto:sahin@sahinakkaya.dev" target="_blank" rel="noreferrer">
       Get In Touch
     </a>
   );
@@ -191,6 +185,7 @@ const Hero = () => {
         </TransitionGroup>
       )}
       <div className="hero-chat-wrapper">
+        <h3>Talk to my Digital Copy — the one who escaped the Matrix.</h3>
         <Chat />
       </div>
     </StyledHeroSection>

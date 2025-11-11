@@ -76,6 +76,10 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
         platforms: linux/amd64,linux/arm64
+        build-args: |
+              NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+              NEXT_PUBLIC_CHAT_API_URL=${{ secrets.NEXT_PUBLIC_CHAT_API_URL }}
+              NEXT_PUBLIC_CHAT_WS_URL=${{ secrets.NEXT_PUBLIC_CHAT_WS_URL }}
 
     - name: Notify server after successful build
       if: success() && github.event_name != 'pull_request'
