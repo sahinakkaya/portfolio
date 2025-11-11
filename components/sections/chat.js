@@ -363,9 +363,6 @@ const Chat = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
-  const [welcomeMessage] = useState(() => {
-    return welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
-  });
   const [inputPlaceholder] = useState(() => {
     return inputPlaceholders[Math.floor(Math.random() * inputPlaceholders.length)];
   });
