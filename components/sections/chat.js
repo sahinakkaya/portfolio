@@ -60,13 +60,13 @@ const StyledEmptyState = styled.div`
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: ${({ theme }) => theme.colors.slate};
+  color: ${({ $isError, theme }) => $isError ? '#ff6464' : theme.colors.slate};
   font-size: 13px;
-  opacity: 0.5;
+  opacity: ${({ $isError }) => $isError ? 1 : 0.5};
 
   &:before {
-    content: '$ ';
-    color: ${({ theme }) => theme.colors.green};
+    content: '${({ $isError }) => $isError ? '! ' : '$ '}';
+    color: ${({ $isError, theme }) => $isError ? '#ff6464' : theme.colors.green};
   }
 `;
 
@@ -108,10 +108,6 @@ const StyledMessage = styled.div`
     @media (max-width: 480px) {
       font-size: 12px;
     }
-  }
-
-  &.error .message-content {
-    color: #ff6464;
   }
 `;
 
@@ -344,6 +340,7 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
   const [welcomeMessage] = useState(() => {
     return welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
   });
@@ -429,6 +426,7 @@ const Chat = () => {
         websocket.onopen = () => {
           setConnected(true);
           setConnectionFailed(false);
+          setErrorMessage(''); // Clear any error messages
           setWs(websocket);
           retryCountRef.current = 0; // Reset retry count on successful connection
         };
@@ -505,7 +503,11 @@ const Chat = () => {
   }, [token, userId]);
 
   const addMessage = (type, content) => {
-    setMessages((prev) => [...prev, { type, content, id: Date.now() }]);
+    if (type === 'error') {
+      setErrorMessage(content);
+    } else {
+      setMessages((prev) => [...prev, { type, content, id: Date.now() }]);
+    }
   };
 
   const sendMessage = () => {
@@ -548,6 +550,7 @@ const Chat = () => {
     }
     retryCountRef.current = 0;
     setConnectionFailed(false);
+    setErrorMessage(''); // Clear error message when retrying
     if (connectWebSocketRef.current) {
       connectWebSocketRef.current();
     }
@@ -566,17 +569,18 @@ const Chat = () => {
         AI responses may not be accurate. This is just a fun project!
       </StyledTooltip>
       <StyledMessagesArea ref={messagesAreaRef}>
-        {messages.length === 0 && !isLoading ? (
-          <StyledEmptyState>{welcomeMessage}</StyledEmptyState>
+        {errorMessage ? (
+          <StyledEmptyState $isError={true}>{errorMessage}</StyledEmptyState>
+        ) : messages.length === 0 && !isLoading ? (
+          <StyledEmptyState $isError={false}>{welcomeMessage}</StyledEmptyState>
         ) : (
           messages.map((message) => (
             <StyledMessage
               key={message.id}
               $isUser={message.type === 'sent'}
-              className={message.type === 'error' ? 'error' : ''}
             >
               <div className="message-prompt">
-                {message.type === 'sent' ? '$' : message.type === 'error' ? '!' : '>'}
+                {message.type === 'sent' ? '$' : '>'}
               </div>
               <div className="message-content">{message.content}</div>
             </StyledMessage>
