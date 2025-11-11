@@ -30,15 +30,6 @@ const StyledMessagesArea = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.slate};
-    border-radius: 3px;
-  }
 `;
 
 const StyledEmptyState = styled.div`
