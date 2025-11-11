@@ -355,21 +355,17 @@ const inputPlaceholders = [
 
 // TypewriterMessage component for animating chat responses
 const TypewriterMessage = ({ content }) => {
-  const [displayedContent, setDisplayedContent] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    if (currentIndex < content.length) {
-      const timeout = setTimeout(() => {
-        setDisplayedContent((prev) => prev + content[currentIndex]);
-        setCurrentIndex((prev) => prev + 1);
-      }, 20); // Adjust speed here (milliseconds per character)
-
-      return () => clearTimeout(timeout);
-    }
-  }, [currentIndex, content]);
-
-  return <>{displayedContent}</>;
+  return (
+    <Typewriter
+      options={{
+        strings: [content],
+        autoStart: true,
+        loop: false,
+        delay: 20,
+        cursor: '',
+      }}
+    />
+  );
 };
 
 const Chat = () => {
