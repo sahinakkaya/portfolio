@@ -260,6 +260,20 @@ const generateUUID = () => {
   });
 };
 
+// Random welcome messages
+const welcomeMessages = [
+  "You've connected to the mainframe. What truth are you looking for?",
+  "The simulation is listening… what's your question, traveler?",
+  "Welcome back, operator. The code awaits your input.",
+  "Another soul seeking the source. Speak your query.",
+  "Reality is loading… type to distort it.",
+  "Your signal has been traced. What brings you to the system?",
+  "Transmission stable. Upload your thoughts.",
+  "Access granted. What line of code will you bend today?",
+  "Don't worry — there is no syntax error. Ask your question.",
+  "You're in. Let's rewrite the Matrix together.",
+];
+
 const Chat = () => {
   const [userId, setUserId] = useState('');
   const [token, setToken] = useState('');
@@ -269,6 +283,9 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [welcomeMessage] = useState(() => {
+    return welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+  });
   const messagesAreaRef = useRef(null);
   const retryCountRef = useRef(0);
   const maxRetries = 3;
@@ -486,7 +503,7 @@ const Chat = () => {
       </StyledTooltip>
       <StyledMessagesArea ref={messagesAreaRef}>
         {messages.length === 0 && !isLoading ? (
-          <StyledEmptyState>Access granted. What line of code will you bend today?</StyledEmptyState>
+          <StyledEmptyState>{welcomeMessage}</StyledEmptyState>
         ) : (
           messages.map((message) => (
             <StyledMessage
