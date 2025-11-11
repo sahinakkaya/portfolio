@@ -169,41 +169,51 @@ const StyledInputArea = styled.div`
 
 const StyledInfoIcon = styled.div`
   position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 18px;
-  height: 18px;
-  border: 1px solid ${({ theme }) => theme.colors.slate};
-  border-radius: 50%;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
-  color: ${({ theme }) => theme.colors.slate};
   cursor: help;
-  opacity: 0.5;
   transition: ${({ theme }) => theme.transition};
 
   &:hover {
+    svg {
+      stroke: ${({ theme }) => theme.colors.green};
+    }
+  }
+
+  &:hover + div {
     opacity: 1;
-    border-color: ${({ theme }) => theme.colors.green};
-    color: ${({ theme }) => theme.colors.green};
   }
 
   @media (max-width: 480px) {
-    top: 12px;
-    right: 12px;
+    top: 8px;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+  }
+
+  svg {
     width: 16px;
     height: 16px;
-    font-size: 10px;
+    stroke: ${({ theme }) => theme.colors.slate};
+    fill: none;
+    transition: ${({ theme }) => theme.transition};
+
+    @media (max-width: 480px) {
+      width: 14px;
+      height: 14px;
+    }
   }
 `;
 
 const StyledTooltip = styled.div`
   position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 8px;
+  top: 34px;
+  right: 10px;
   background-color: ${({ theme }) => theme.colors.lightNavy};
   border: 1px solid ${({ theme }) => theme.colors.green};
   border-radius: 4px;
@@ -216,16 +226,13 @@ const StyledTooltip = styled.div`
   transition: opacity 0.2s ease;
   z-index: 10;
 
-  ${StyledInfoIcon}:hover & {
-    opacity: 1;
-  }
-
   @media (max-width: 480px) {
     font-size: 10px;
     padding: 8px 10px;
     white-space: normal;
     width: 200px;
-    right: -10px;
+    right: 8px;
+    top: 28px;
   }
 `;
 
@@ -402,11 +409,15 @@ const Chat = () => {
     <StyledChatSection>
       <StyledChatContainer>
         <StyledInfoIcon>
-          i
-          <StyledTooltip>
-            AI responses may not be accurate. This is just a fun project!
-          </StyledTooltip>
+          <svg viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12" y2="8" />
+          </svg>
         </StyledInfoIcon>
+        <StyledTooltip>
+          AI responses may not be accurate. This is just a fun project!
+        </StyledTooltip>
         <StyledMessagesArea ref={messagesAreaRef}>
           {messages.length === 0 && !isLoading ? (
             <StyledEmptyState>type a message to start...</StyledEmptyState>
