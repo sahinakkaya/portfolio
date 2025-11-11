@@ -270,6 +270,8 @@ const Chat = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const messagesAreaRef = useRef(null);
+  const retryCountRef = useRef(0);
+  const maxRetries = 3;
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
@@ -331,49 +333,83 @@ const Chat = () => {
   useEffect(() => {
     if (!token || !userId) return;
 
-    const fullUrl = `${chat.wsUrl}?token=${encodeURIComponent(
-      token
-    )}&userid=${encodeURIComponent(userId)}`;
+    let websocket = null;
+    let retryTimeout = null;
 
-    try {
-      const websocket = new WebSocket(fullUrl);
+    const connectWebSocket = () => {
+      const fullUrl = `${chat.wsUrl}?token=${encodeURIComponent(
+        token
+      )}&userid=${encodeURIComponent(userId)}`;
 
-      websocket.onopen = () => {
-        setConnected(true);
-        setWs(websocket);
-      };
+      try {
+        websocket = new WebSocket(fullUrl);
 
-      websocket.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
+        websocket.onopen = () => {
+          setConnected(true);
+          setWs(websocket);
+          retryCountRef.current = 0; // Reset retry count on successful connection
+        };
 
-          if (data.type === 'response') {
-            addMessage('received', data.content);
-          } else if (data.type === 'error') {
-            addMessage('error', data.message);
+        websocket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+
+            if (data.type === 'response') {
+              addMessage('received', data.content);
+            } else if (data.type === 'error') {
+              addMessage('error', data.message);
+            }
+          } catch (e) {
+            console.error('Failed to parse message:', e);
+            addMessage('error', 'Failed to parse server response');
           }
-        } catch (e) {
-          console.error('Failed to parse message:', e);
-          addMessage('error', 'Failed to parse server response');
+        };
+
+        websocket.onerror = (error) => {
+          console.error('WebSocket error:', error);
+        };
+
+        websocket.onclose = (event) => {
+          setConnected(false);
+          setWs(null);
+
+          // Only retry if connection was not successful and we haven't exceeded max retries
+          if (!event.wasClean && retryCountRef.current < maxRetries) {
+            const delay = Math.pow(2, retryCountRef.current) * 1000; // Exponential backoff: 1s, 2s, 4s
+            console.log(`Retrying connection... Attempt ${retryCountRef.current + 1}/${maxRetries}`);
+
+            retryTimeout = setTimeout(() => {
+              retryCountRef.current += 1;
+              connectWebSocket();
+            }, delay);
+          } else if (retryCountRef.current >= maxRetries) {
+            addMessage('error', 'Connection error occurred. Failed after 3 retries.');
+          }
+        };
+      } catch (e) {
+        console.error('Failed to connect:', e);
+
+        // Retry on exception
+        if (retryCountRef.current < maxRetries) {
+          const delay = Math.pow(2, retryCountRef.current) * 1000;
+          retryTimeout = setTimeout(() => {
+            retryCountRef.current += 1;
+            connectWebSocket();
+          }, delay);
+        } else {
+          addMessage('error', `Failed to connect: ${e.message}`);
         }
-      };
+      }
+    };
 
-      websocket.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        addMessage('error', 'Connection error occurred');
-      };
-
-      websocket.onclose = () => {
-        setConnected(false);
-        setWs(null);
-      };
-    } catch (e) {
-      console.error('Failed to connect:', e);
-      addMessage('error', `Failed to connect: ${e.message}`);
-    }
+    // Initial connection attempt
+    connectWebSocket();
 
     // Cleanup
     return () => {
+      if (retryTimeout) {
+        clearTimeout(retryTimeout);
+      }
       if (websocket && websocket.readyState === WebSocket.OPEN) {
         websocket.close();
       }
