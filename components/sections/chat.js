@@ -63,10 +63,49 @@ const StyledEmptyState = styled.div`
   color: ${({ $isError, theme }) => $isError ? '#ff6464' : theme.colors.slate};
   font-size: 13px;
   opacity: ${({ $isError }) => $isError ? 1 : 0.5};
+  animation: ${({ $isError }) => $isError ? 'none' : 'fadeIn 0.8s ease-in, breathe 3s ease-in-out infinite'};
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 0.5;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes breathe {
+    0%, 100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  @keyframes blink {
+    0%, 50% {
+      opacity: 1;
+    }
+    51%, 100% {
+      opacity: 0;
+    }
+  }
 
   &:before {
     content: '${({ $isError }) => $isError ? '! ' : '$ '}';
     color: ${({ $isError, theme }) => $isError ? '#ff6464' : theme.colors.green};
+    text-shadow: ${({ $isError, theme }) =>
+      $isError ? '0 0 8px #ff6464' : `0 0 8px ${theme.colors.green}`};
+  }
+
+  &:after {
+    content: '${({ $isError }) => $isError ? '' : '_'}';
+    color: ${({ theme }) => theme.colors.green};
+    margin-left: 2px;
+    animation: ${({ $isError }) => $isError ? 'none' : 'blink 1s step-start infinite'};
   }
 `;
 
