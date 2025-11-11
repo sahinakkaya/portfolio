@@ -2,20 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { chat } from '../../lib/config';
 
-const StyledChatSection = styled.section`
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 0 50px 0;
-
-  @media (max-width: 768px) {
-    padding: 0 0 40px 0;
-  }
-
-  @media (max-width: 480px) {
-    padding: 0 0 30px 0;
-  }
-`;
-
 const StyledChatContainer = styled.div`
   height: 50vh;
   max-height: 500px;
@@ -406,50 +392,48 @@ const Chat = () => {
   };
 
   return (
-    <StyledChatSection>
-      <StyledChatContainer>
-        <StyledInfoIcon>
-          <svg viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="16" x2="12" y2="12" />
-            <line x1="12" y1="8" x2="12" y2="8" />
-          </svg>
-        </StyledInfoIcon>
-        <StyledTooltip>
-          AI responses may not be accurate. This is just a fun project!
-        </StyledTooltip>
-        <StyledMessagesArea ref={messagesAreaRef}>
-          {messages.length === 0 && !isLoading ? (
-            <StyledEmptyState>type a message to start...</StyledEmptyState>
-          ) : (
-            messages.map((message) => (
-              <StyledMessage
-                key={message.id}
-                $isUser={message.type === 'sent'}
-                className={message.type === 'error' ? 'error' : ''}
-              >
-                <div className="message-prompt">
-                  {message.type === 'sent' ? '$' : message.type === 'error' ? '!' : '>'}
-                </div>
-                <div className="message-content">{message.content}</div>
-              </StyledMessage>
-            ))
-          )}
-        </StyledMessagesArea>
+    <StyledChatContainer>
+      <StyledInfoIcon>
+        <svg viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12" y2="8" />
+        </svg>
+      </StyledInfoIcon>
+      <StyledTooltip>
+        AI responses may not be accurate. This is just a fun project!
+      </StyledTooltip>
+      <StyledMessagesArea ref={messagesAreaRef}>
+        {messages.length === 0 && !isLoading ? (
+          <StyledEmptyState>type a message to start...</StyledEmptyState>
+        ) : (
+          messages.map((message) => (
+            <StyledMessage
+              key={message.id}
+              $isUser={message.type === 'sent'}
+              className={message.type === 'error' ? 'error' : ''}
+            >
+              <div className="message-prompt">
+                {message.type === 'sent' ? '$' : message.type === 'error' ? '!' : '>'}
+              </div>
+              <div className="message-content">{message.content}</div>
+            </StyledMessage>
+          ))
+        )}
+      </StyledMessagesArea>
 
-        <StyledInputArea>
-          <div className="input-prompt">$</div>
-          <input
-            type="text"
-            placeholder="type your message..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={!connected}
-          />
-        </StyledInputArea>
-      </StyledChatContainer>
-    </StyledChatSection>
+      <StyledInputArea>
+        <div className="input-prompt">$</div>
+        <input
+          type="text"
+          placeholder="type your message..."
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyPress={handleKeyPress}
+          disabled={!connected}
+        />
+      </StyledInputArea>
+    </StyledChatContainer>
   );
 };
 

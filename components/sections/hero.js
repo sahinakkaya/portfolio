@@ -4,11 +4,13 @@ import styled from 'styled-components';
 import Typewriter from 'typewriter-effect';
 import { navDelay, loaderDelay } from '../../src/utils';
 import { usePrefersReducedMotion } from '../../src/hooks';
+import Chat from './chat';
 
 const StyledHeroSection = styled.section`
-  ${({ theme }) => theme.mixins.flexCenter};
+  display: flex;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: center;
   min-height: 100vh;
   padding: 0;
 
@@ -61,6 +63,20 @@ const StyledHeroSection = styled.section`
     ${({ theme }) => theme.mixins.bigButton};
     margin-top: 50px;
     display: inline-block;
+  }
+
+  .hero-chat-wrapper {
+    width: 100%;
+    margin-top: 80px;
+    max-width: 1000px;
+
+    @media (max-width: 768px) {
+      margin-top: 60px;
+    }
+
+    @media (max-width: 480px) {
+      margin-top: 50px;
+    }
   }
 `;
 
@@ -158,6 +174,9 @@ const Hero = () => {
             ))}
         </TransitionGroup>
       )}
+      <div className="hero-chat-wrapper">
+        <Chat />
+      </div>
     </StyledHeroSection>
   );
 };
