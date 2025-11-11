@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import Typewriter from 'typewriter-effect';
 import { chat } from '../../lib/config';
 
 const StyledChatContainer = styled.div`
@@ -63,25 +62,13 @@ const StyledEmptyState = styled.div`
   height: 100%;
   color: ${({ $isError, theme }) => $isError ? '#ff6464' : theme.colors.slate};
   font-size: 13px;
-  opacity: ${({ $isError }) => $isError ? 1 : 0.5};
-  animation: ${({ $isError }) => $isError ? 'none' : 'fadeIn 0.8s ease-in, breathe 3s ease-in-out infinite'};
+  animation: ${({ $isError }) => $isError ? 'none' : 'fadeInOut 4s ease-in-out infinite'};
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 0.5;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes breathe {
+  @keyframes fadeInOut {
     0%, 100% {
-      opacity: 0.5;
+      opacity: 0;
     }
-    50% {
+    10%, 90% {
       opacity: 0.7;
     }
   }
@@ -93,16 +80,22 @@ const StyledEmptyState = styled.div`
     margin-right: 8px;
   }
 
-  .Typewriter {
+  .message-text {
     display: inline;
   }
 
-  .Typewriter__wrapper {
-    color: ${({ theme }) => theme.colors.slate};
+  .cursor {
+    color: ${({ theme }) => theme.colors.green};
+    animation: blink 1s step-start infinite;
   }
 
-  .Typewriter__cursor {
-    color: ${({ theme }) => theme.colors.green};
+  @keyframes blink {
+    0%, 50% {
+      opacity: 1;
+    }
+    51%, 100% {
+      opacity: 0;
+    }
   }
 `;
 
@@ -363,9 +356,9 @@ const Chat = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
-  const [welcomeMessage] = useState(() => {
-    return welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
-  });
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(
+    Math.floor(Math.random() * welcomeMessages.length)
+  );
   const [inputPlaceholder] = useState(() => {
     return inputPlaceholders[Math.floor(Math.random() * inputPlaceholders.length)];
   });
@@ -384,6 +377,17 @@ const Chat = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Cycle through welcome messages
+  useEffect(() => {
+    if (messages.length === 0 && !isLoading && !errorMessage) {
+      const timer = setInterval(() => {
+        setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % welcomeMessages.length);
+      }, 6000); // Change message every 6 seconds
+
+      return () => clearInterval(timer);
+    }
+  }, [messages.length, isLoading, errorMessage]);
 
   // Initialize: Generate UUID and fetch token
   useEffect(() => {
@@ -597,17 +601,10 @@ const Chat = () => {
             {errorMessage}
           </StyledEmptyState>
         ) : messages.length === 0 && !isLoading ? (
-          <StyledEmptyState $isError={false}>
+          <StyledEmptyState $isError={false} key={currentMessageIndex}>
             <span className="prompt">$</span>
-            <Typewriter
-              options={{
-                strings: [welcomeMessage],
-                autoStart: true,
-                loop: true,
-                delay: 50,
-                cursor: '_',
-              }}
-            />
+            <span className="message-text">{welcomeMessages[currentMessageIndex]}</span>
+            <span className="cursor">_</span>
           </StyledEmptyState>
         ) : (
           messages.map((message) => (
