@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { chat } from '../../lib/config';
 
 const StyledChatContainer = styled.div`
-  height: 50vh;
+  flex: 1;
   max-height: 500px;
   min-height: 300px;
   display: flex;
@@ -16,14 +16,14 @@ const StyledChatContainer = styled.div`
   position: relative;
 
   @media (max-width: 768px) {
-    height: 400px;
-    min-height: 350px;
+    max-height: 400px;
+    min-height: 280px;
     padding: 15px;
   }
 
   @media (max-width: 480px) {
-    height: 350px;
-    min-height: 300px;
+    max-height: 350px;
+    min-height: 250px;
     padding: 12px;
   }
 `;

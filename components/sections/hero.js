@@ -10,9 +10,10 @@ const StyledHeroSection = styled.section`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 100vh;
   padding: 0;
+  padding-top: 100px;
 
   @media (max-height: 700px) and (min-width: 700px), (max-width: 360px) {
     height: auto;
@@ -67,15 +68,19 @@ const StyledHeroSection = styled.section`
 
   .hero-chat-wrapper {
     width: 100%;
-    margin-top: 80px;
+    margin-top: 60px;
     max-width: 1000px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 
     @media (max-width: 768px) {
-      margin-top: 60px;
+      margin-top: 40px;
     }
 
     @media (max-width: 480px) {
-      margin-top: 50px;
+      margin-top: 30px;
     }
   }
 `;
