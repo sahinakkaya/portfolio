@@ -11,13 +11,23 @@ const StyledHeroSection = styled.section`
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  min-height: 100vh;
-  padding: 0;
-  padding-top: 100px;
+  height: 100vh;
+  padding: 100px 0 40px 0;
+  overflow: hidden;
 
   @media (max-height: 700px) and (min-width: 700px), (max-width: 360px) {
     height: auto;
+    min-height: 100vh;
     padding-top: 100px;
+    padding-bottom: 40px;
+  }
+
+  @media (max-width: 768px) {
+    padding-bottom: 30px;
+  }
+
+  @media (max-width: 480px) {
+    padding-bottom: 20px;
   }
 
   h1 {
@@ -74,6 +84,7 @@ const StyledHeroSection = styled.section`
     display: flex;
     flex-direction: column;
     min-height: 0;
+    overflow: hidden;
 
     @media (max-width: 768px) {
       margin-top: 40px;

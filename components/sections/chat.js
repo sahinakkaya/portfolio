@@ -3,9 +3,7 @@ import styled from 'styled-components';
 import { chat } from '../../lib/config';
 
 const StyledChatContainer = styled.div`
-  flex: 1;
-  max-height: 500px;
-  min-height: 300px;
+  height: 100%;
   display: flex;
   flex-direction: column;
   font-family: ${({ theme }) => theme.fonts.SFMono};
@@ -14,16 +12,13 @@ const StyledChatContainer = styled.div`
   padding: 20px;
   background-color: rgba(10, 25, 47, 0.5);
   position: relative;
+  overflow: hidden;
 
   @media (max-width: 768px) {
-    max-height: 400px;
-    min-height: 280px;
     padding: 15px;
   }
 
   @media (max-width: 480px) {
-    max-height: 350px;
-    min-height: 250px;
     padding: 12px;
   }
 `;
