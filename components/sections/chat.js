@@ -187,11 +187,13 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const messagesEndRef = useRef(null);
+  const messagesAreaRef = useRef(null);
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesAreaRef.current) {
+      messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -336,7 +338,7 @@ const Chat = () => {
   return (
     <StyledChatSection>
       <StyledChatContainer>
-        <StyledMessagesArea>
+        <StyledMessagesArea ref={messagesAreaRef}>
           {messages.length === 0 && !isLoading ? (
             <StyledEmptyState>type a message to start...</StyledEmptyState>
           ) : (
@@ -353,7 +355,6 @@ const Chat = () => {
               </StyledMessage>
             ))
           )}
-          <div ref={messagesEndRef} />
         </StyledMessagesArea>
 
         <StyledInputArea>
