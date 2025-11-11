@@ -58,8 +58,8 @@ const StyledMessagesArea = styled.div`
 
 const StyledEmptyState = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
+  // align-items: center;
+  // justify-content: center;
   height: 100%;
   color: ${({ $isError, theme }) => $isError ? '#ff6464' : theme.colors.slate};
   font-size: 13px;
@@ -101,9 +101,9 @@ const StyledEmptyState = styled.div`
     color: ${({ theme }) => theme.colors.slate};
   }
 
-  .Typewriter__cursor {
-    color: ${({ theme }) => theme.colors.green};
-  }
+  // .Typewriter__cursor {
+  //   color: ${({ theme }) => theme.colors.green};
+  // }
 `;
 
 const StyledMessage = styled.div`
@@ -598,14 +598,15 @@ const Chat = () => {
           </StyledEmptyState>
         ) : messages.length === 0 && !isLoading ? (
           <StyledEmptyState $isError={false}>
-            <span className="prompt">$</span>
+            <span className="prompt">{">"}</span>
             <Typewriter
               options={{
-                strings: [welcomeMessage],
+                strings: welcomeMessages,
                 autoStart: true,
                 loop: true,
                 delay: 50,
-                cursor: '_',
+                deleteSpeed: 10,
+                pauseFor: 12000,
               }}
             />
           </StyledEmptyState>
