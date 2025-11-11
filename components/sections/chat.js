@@ -22,15 +22,22 @@ const StyledChatContainer = styled.div`
   min-height: 300px;
   display: flex;
   flex-direction: column;
+  font-family: ${({ theme }) => theme.fonts.SFMono};
+  border: 1px solid ${({ theme }) => theme.colors.lightestNavy};
+  border-radius: 4px;
+  padding: 20px;
+  background-color: rgba(10, 25, 47, 0.5);
 
   @media (max-width: 768px) {
     height: 400px;
     min-height: 350px;
+    padding: 15px;
   }
 
   @media (max-width: 480px) {
     height: 350px;
     min-height: 300px;
+    padding: 12px;
   }
 `;
 
@@ -40,7 +47,7 @@ const StyledMessagesArea = styled.div`
   margin-bottom: 15px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -58,12 +65,18 @@ const StyledEmptyState = styled.div`
   justify-content: center;
   height: 100%;
   color: ${({ theme }) => theme.colors.slate};
-  font-size: ${({ theme }) => theme.fontSizes.small};
+  font-size: 13px;
   opacity: 0.5;
+
+  &:before {
+    content: '$ ';
+    color: ${({ theme }) => theme.colors.green};
+  }
 `;
 
 const StyledMessage = styled.div`
   display: flex;
+  gap: 8px;
   animation: fadeIn 0.3s ease-in;
 
   @keyframes fadeIn {
@@ -77,44 +90,61 @@ const StyledMessage = styled.div`
     }
   }
 
+  .message-prompt {
+    color: ${({ theme }) => theme.colors.green};
+    font-size: 13px;
+    flex-shrink: 0;
+
+    @media (max-width: 480px) {
+      font-size: 12px;
+    }
+  }
+
   .message-content {
-    padding: 8px 0;
-    max-width: 90%;
-    align-self: ${({ $isUser }) => ($isUser ? 'flex-end' : 'flex-start')};
+    flex: 1;
     color: ${({ $isUser, theme }) =>
       $isUser ? theme.colors.green : theme.colors.lightestSlate};
-    font-size: ${({ theme }) => theme.fontSizes.small};
-    line-height: 1.5;
+    font-size: 13px;
+    line-height: 1.6;
     word-wrap: break-word;
     overflow-wrap: break-word;
 
     @media (max-width: 480px) {
-      font-size: 13px;
+      font-size: 12px;
     }
   }
 
   &.error .message-content {
     color: #ff6464;
-    opacity: 0.8;
   }
 `;
 
 const StyledInputArea = styled.div`
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  align-items: center;
   border-top: 1px solid ${({ theme }) => theme.colors.lightestNavy};
   padding-top: 15px;
+
+  .input-prompt {
+    color: ${({ theme }) => theme.colors.green};
+    font-size: 13px;
+    flex-shrink: 0;
+
+    @media (max-width: 480px) {
+      font-size: 12px;
+    }
+  }
 
   input {
     flex: 1;
     background-color: transparent;
     border: none;
-    border-bottom: 1px solid ${({ theme }) => theme.colors.slate};
-    padding: 8px 0;
-    color: ${({ theme }) => theme.colors.lightestSlate};
-    font-family: ${({ theme }) => theme.fonts.Calibre};
-    font-size: ${({ theme }) => theme.fontSizes.small};
-    transition: ${({ theme }) => theme.transition};
+    padding: 0;
+    color: ${({ theme }) => theme.colors.green};
+    font-family: ${({ theme }) => theme.fonts.SFMono};
+    font-size: 13px;
+    caret-color: ${({ theme }) => theme.colors.green};
 
     &::placeholder {
       color: ${({ theme }) => theme.colors.slate};
@@ -123,31 +153,6 @@ const StyledInputArea = styled.div`
 
     &:focus {
       outline: none;
-      border-bottom-color: ${({ theme }) => theme.colors.green};
-    }
-
-    &:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
-
-    @media (max-width: 480px) {
-      font-size: 13px;
-    }
-  }
-
-  button {
-    background: none;
-    border: none;
-    color: ${({ theme }) => theme.colors.green};
-    font-family: ${({ theme }) => theme.fonts.SFMono};
-    font-size: ${({ theme }) => theme.fontSizes.small};
-    cursor: pointer;
-    transition: ${({ theme }) => theme.transition};
-    padding: 0;
-
-    &:hover:not(:disabled) {
-      opacity: 0.7;
     }
 
     &:disabled {
@@ -333,7 +338,7 @@ const Chat = () => {
       <StyledChatContainer>
         <StyledMessagesArea>
           {messages.length === 0 && !isLoading ? (
-            <StyledEmptyState>Start chatting...</StyledEmptyState>
+            <StyledEmptyState>type a message to start...</StyledEmptyState>
           ) : (
             messages.map((message) => (
               <StyledMessage
@@ -341,6 +346,9 @@ const Chat = () => {
                 $isUser={message.type === 'sent'}
                 className={message.type === 'error' ? 'error' : ''}
               >
+                <div className="message-prompt">
+                  {message.type === 'sent' ? '$' : message.type === 'error' ? '!' : '>'}
+                </div>
                 <div className="message-content">{message.content}</div>
               </StyledMessage>
             ))
@@ -349,17 +357,15 @@ const Chat = () => {
         </StyledMessagesArea>
 
         <StyledInputArea>
+          <div className="input-prompt">$</div>
           <input
             type="text"
-            placeholder="Message..."
+            placeholder="type your message..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
             disabled={!connected}
           />
-          <button onClick={sendMessage} disabled={!connected || !inputValue.trim()}>
-            →
-          </button>
         </StyledInputArea>
       </StyledChatContainer>
     </StyledChatSection>
