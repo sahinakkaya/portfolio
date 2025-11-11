@@ -331,7 +331,7 @@ const Chat = () => {
         }
       } catch (error) {
         console.error('Failed to initialize chat:', error);
-        addMessage('error', `Failed to connect: ${error.message}`);
+        addMessage('error', 'Access denied. The mainframe is unreachable.');
       } finally {
         setIsLoading(false);
       }
@@ -380,7 +380,7 @@ const Chat = () => {
             }
           } catch (e) {
             console.error('Failed to parse message:', e);
-            addMessage('error', 'Failed to parse server response');
+            addMessage('error', 'Signal corrupted. Unable to decode transmission.');
           }
         };
 
@@ -403,7 +403,7 @@ const Chat = () => {
             }, delay);
           } else if (retryCountRef.current >= maxRetries) {
             setConnectionFailed(true);
-            addMessage('error', 'Connection error occurred. Failed after 3 retries.');
+            addMessage('error', 'Connection to the Matrix lost. All retry attempts exhausted.');
           }
         };
       } catch (e) {
@@ -418,7 +418,7 @@ const Chat = () => {
           }, delay);
         } else {
           setConnectionFailed(true);
-          addMessage('error', `Failed to connect: ${e.message}`);
+          addMessage('error', 'System breach failed. Cannot establish uplink.');
         }
       }
     };
@@ -450,7 +450,7 @@ const Chat = () => {
     if (!content) return;
 
     if (!ws || ws.readyState !== WebSocket.OPEN) {
-      addMessage('error', 'Not connected to server');
+      addMessage('error', 'Disconnected from the Matrix. Cannot transmit.');
       return;
     }
 
@@ -465,7 +465,7 @@ const Chat = () => {
       addMessage('sent', content);
       setInputValue('');
     } catch (e) {
-      addMessage('error', `Failed to send message: ${e.message}`);
+      addMessage('error', 'Transmission failed. Message lost in the void.');
       console.error('Send error:', e);
     }
   };
