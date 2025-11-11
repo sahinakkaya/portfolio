@@ -312,9 +312,6 @@ const Chat = () => {
       const newUserId = generateUUID();
       setUserId(newUserId);
 
-      // Add system message
-      addMessage('system', 'Initializing chat...');
-
       try {
         // Fetch token
         const response = await fetch(
@@ -332,7 +329,6 @@ const Chat = () => {
 
         if (data.token) {
           setToken(data.token);
-          addMessage('system', 'Connected! Start chatting with AI...');
         } else {
           throw new Error('No token in response');
         }
