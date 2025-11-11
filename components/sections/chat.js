@@ -603,7 +603,7 @@ const Chat = () => {
               options={{
                 strings: [welcomeMessage],
                 autoStart: true,
-                loop: false,
+                loop: true,
                 delay: 50,
                 cursor: '_',
               }}
