@@ -486,7 +486,7 @@ const Chat = () => {
       </StyledTooltip>
       <StyledMessagesArea ref={messagesAreaRef}>
         {messages.length === 0 && !isLoading ? (
-          <StyledEmptyState>type a message to start...</StyledEmptyState>
+          <StyledEmptyState>Access granted. What line of code will you bend today?</StyledEmptyState>
         ) : (
           messages.map((message) => (
             <StyledMessage
