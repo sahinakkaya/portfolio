@@ -162,6 +162,22 @@ const StyledInputArea = styled.div`
   }
 `;
 
+const StyledRetryButton = styled.button`
+  ${({ theme }) => theme.mixins.smallButton};
+  padding: 8px 16px;
+  font-size: 12px;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: rgba(100, 255, 218, 0.1);
+  }
+
+  @media (max-width: 480px) {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+`;
+
 const StyledInfoIcon = styled.div`
   position: absolute;
   top: 10px;
@@ -249,6 +265,7 @@ const Chat = () => {
   const [token, setToken] = useState('');
   const [ws, setWs] = useState(null);
   const [connected, setConnected] = useState(false);
+  const [connectionFailed, setConnectionFailed] = useState(false);
   const [messages, setMessages] = useState([
     { type: 'sent', content: 'Hello! How can I help you today?', id: 1 },
     { type: 'received', content: 'Hi there! I can assist you with various questions. What would you like to know?', id: 2 },
@@ -272,6 +289,7 @@ const Chat = () => {
   const messagesAreaRef = useRef(null);
   const retryCountRef = useRef(0);
   const maxRetries = 3;
+  const connectWebSocketRef = useRef(null);
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
@@ -346,6 +364,7 @@ const Chat = () => {
 
         websocket.onopen = () => {
           setConnected(true);
+          setConnectionFailed(false);
           setWs(websocket);
           retryCountRef.current = 0; // Reset retry count on successful connection
         };
@@ -383,6 +402,7 @@ const Chat = () => {
               connectWebSocket();
             }, delay);
           } else if (retryCountRef.current >= maxRetries) {
+            setConnectionFailed(true);
             addMessage('error', 'Connection error occurred. Failed after 3 retries.');
           }
         };
@@ -397,10 +417,14 @@ const Chat = () => {
             connectWebSocket();
           }, delay);
         } else {
+          setConnectionFailed(true);
           addMessage('error', `Failed to connect: ${e.message}`);
         }
       }
     };
+
+    // Store connectWebSocket function in ref for manual retry
+    connectWebSocketRef.current = connectWebSocket;
 
     // Initial connection attempt
     connectWebSocket();
@@ -453,6 +477,14 @@ const Chat = () => {
     }
   };
 
+  const handleRetry = () => {
+    retryCountRef.current = 0;
+    setConnectionFailed(false);
+    if (connectWebSocketRef.current) {
+      connectWebSocketRef.current();
+    }
+  };
+
   return (
     <StyledChatContainer>
       <StyledInfoIcon>
@@ -485,15 +517,23 @@ const Chat = () => {
       </StyledMessagesArea>
 
       <StyledInputArea>
-        <div className="input-prompt">$</div>
-        <input
-          type="text"
-          placeholder="type your message..."
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyPress={handleKeyPress}
-          disabled={!connected}
-        />
+        {connectionFailed ? (
+          <StyledRetryButton onClick={handleRetry}>
+            Retry Connection
+          </StyledRetryButton>
+        ) : (
+          <>
+            <div className="input-prompt">$</div>
+            <input
+              type="text"
+              placeholder="type your message..."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={handleKeyPress}
+              disabled={!connected}
+            />
+          </>
+        )}
       </StyledInputArea>
     </StyledChatContainer>
   );
