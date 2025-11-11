@@ -353,6 +353,25 @@ const inputPlaceholders = [
   "Start the loop...",
 ];
 
+// TypewriterMessage component for animating chat responses
+const TypewriterMessage = ({ content }) => {
+  const [displayedContent, setDisplayedContent] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (currentIndex < content.length) {
+      const timeout = setTimeout(() => {
+        setDisplayedContent((prev) => prev + content[currentIndex]);
+        setCurrentIndex((prev) => prev + 1);
+      }, 20); // Adjust speed here (milliseconds per character)
+
+      return () => clearTimeout(timeout);
+    }
+  }, [currentIndex, content]);
+
+  return <>{displayedContent}</>;
+};
+
 const Chat = () => {
   const [userId, setUserId] = useState('');
   const [token, setToken] = useState('');
@@ -619,7 +638,13 @@ const Chat = () => {
               <div className="message-prompt">
                 {message.type === 'sent' ? '$' : '>'}
               </div>
-              <div className="message-content">{message.content}</div>
+              <div className="message-content">
+                {message.type === 'received' ? (
+                  <TypewriterMessage content={message.content} />
+                ) : (
+                  message.content
+                )}
+              </div>
             </StyledMessage>
           ))
         )}
