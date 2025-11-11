@@ -27,6 +27,7 @@ const StyledChatContainer = styled.div`
   border-radius: 4px;
   padding: 20px;
   background-color: rgba(10, 25, 47, 0.5);
+  position: relative;
 
   @media (max-width: 768px) {
     height: 400px;
@@ -163,6 +164,68 @@ const StyledInputArea = styled.div`
     @media (max-width: 480px) {
       font-size: 12px;
     }
+  }
+`;
+
+const StyledInfoIcon = styled.div`
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 18px;
+  height: 18px;
+  border: 1px solid ${({ theme }) => theme.colors.slate};
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.slate};
+  cursor: help;
+  opacity: 0.5;
+  transition: ${({ theme }) => theme.transition};
+
+  &:hover {
+    opacity: 1;
+    border-color: ${({ theme }) => theme.colors.green};
+    color: ${({ theme }) => theme.colors.green};
+  }
+
+  @media (max-width: 480px) {
+    top: 12px;
+    right: 12px;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+  }
+`;
+
+const StyledTooltip = styled.div`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background-color: ${({ theme }) => theme.colors.lightNavy};
+  border: 1px solid ${({ theme }) => theme.colors.green};
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.lightSlate};
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+
+  ${StyledInfoIcon}:hover & {
+    opacity: 1;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 10px;
+    padding: 8px 10px;
+    white-space: normal;
+    width: 200px;
+    right: -10px;
   }
 `;
 
@@ -338,6 +401,12 @@ const Chat = () => {
   return (
     <StyledChatSection>
       <StyledChatContainer>
+        <StyledInfoIcon>
+          i
+          <StyledTooltip>
+            AI responses may not be accurate. This is just a fun project!
+          </StyledTooltip>
+        </StyledInfoIcon>
         <StyledMessagesArea ref={messagesAreaRef}>
           {messages.length === 0 && !isLoading ? (
             <StyledEmptyState>type a message to start...</StyledEmptyState>
