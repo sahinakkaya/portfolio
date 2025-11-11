@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Layout from '../components/layout';
 import Hero from '../components/sections/hero';
+import Chat from '../components/sections/chat';
 import About from '../components/sections/about';
 import Jobs from '../components/sections/jobs';
 import Featured from '../components/sections/featured';
@@ -18,6 +19,7 @@ const IndexPage = ({ featuredProjects, projects }) => (
   <Layout>
     <StyledMainContainer className="fillHeight">
       <Hero />
+      <Chat />
       <About />
       <Jobs />
       <Featured featuredProjects={featuredProjects} />
