@@ -62,14 +62,17 @@ const StyledEmptyState = styled.div`
   height: 100%;
   color: ${({ $isError, theme }) => $isError ? '#ff6464' : theme.colors.slate};
   font-size: 13px;
-  animation: ${({ $isError }) => $isError ? 'none' : 'fadeInOut 4s ease-in-out infinite'};
+  animation: ${({ $isError }) => $isError ? 'none' : 'fadeInOut 6s ease-in-out'};
 
   @keyframes fadeInOut {
-    0%, 100% {
+    0% {
       opacity: 0;
     }
-    10%, 90% {
+    15%, 85% {
       opacity: 0.7;
+    }
+    100% {
+      opacity: 0;
     }
   }
 
