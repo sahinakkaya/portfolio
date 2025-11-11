@@ -58,11 +58,11 @@ const StyledMessagesArea = styled.div`
 
 const StyledEmptyState = styled.div`
   display: flex;
-  // align-items: center;
-  // justify-content: center;
+  align-items: flex-start;
   height: 100%;
   color: ${({ $isError, theme }) => $isError ? '#ff6464' : theme.colors.slate};
   font-size: 13px;
+  line-height: 1.6;
   opacity: ${({ $isError }) => $isError ? 1 : 0.5};
   animation: ${({ $isError }) => $isError ? 'none' : 'fadeIn 0.8s ease-in, breathe 3s ease-in-out infinite'};
 
@@ -91,6 +91,7 @@ const StyledEmptyState = styled.div`
     text-shadow: ${({ $isError, theme }) =>
       $isError ? '0 0 8px #ff6464' : `0 0 8px ${theme.colors.green}`};
     margin-right: 8px;
+    line-height: 1.6;
   }
 
   .Typewriter {
@@ -109,6 +110,7 @@ const StyledEmptyState = styled.div`
 const StyledMessage = styled.div`
   display: flex;
   gap: 8px;
+  align-items: flex-start;
   animation: fadeIn 0.3s ease-in;
 
   @keyframes fadeIn {
@@ -125,6 +127,7 @@ const StyledMessage = styled.div`
   .message-prompt {
     color: ${({ theme }) => theme.colors.green};
     font-size: 13px;
+    line-height: 1.6;
     flex-shrink: 0;
 
     @media (max-width: 480px) {
@@ -356,19 +359,22 @@ const inputPlaceholders = [
 const Chat = () => {
   const [userId, setUserId] = useState('');
   const [token, setToken] = useState('');
-  const [ws, setWs] = useState(null);
   const [connected, setConnected] = useState(false);
   const [connectionFailed, setConnectionFailed] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
   const [inputPlaceholder] = useState(() => {
     return inputPlaceholders[Math.floor(Math.random() * inputPlaceholders.length)];
   });
   const messagesAreaRef = useRef(null);
+  const turnstileRef = useRef(null);
   const retryCountRef = useRef(0);
   const maxRetries = 3;
+  const wsRef = useRef(null);
+  const retryTimeoutRef = useRef(null);
   const connectWebSocketRef = useRef(null);
 
   // Auto-scroll to bottom when new messages arrive
@@ -382,6 +388,42 @@ const Chat = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Initialize Turnstile widget
+  useEffect(() => {
+    const renderTurnstile = () => {
+      if (window.turnstile && turnstileRef.current && !turnstileRef.current.dataset.widgetId) {
+        const widgetId = window.turnstile.render(turnstileRef.current, {
+          sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+          callback: (token) => {
+            setTurnstileToken(token);
+          },
+          'error-callback': () => {
+            console.error('Turnstile error');
+            setTurnstileToken('');
+          },
+          'expired-callback': () => {
+            setTurnstileToken('');
+          },
+        });
+        turnstileRef.current.dataset.widgetId = widgetId;
+      }
+    };
+
+    // Wait for Turnstile script to load
+    if (window.turnstile) {
+      renderTurnstile();
+    } else {
+      const checkTurnstile = setInterval(() => {
+        if (window.turnstile) {
+          renderTurnstile();
+          clearInterval(checkTurnstile);
+        }
+      }, 100);
+
+      return () => clearInterval(checkTurnstile);
+    }
+  }, []);
+
   // Initialize: Generate UUID and fetch token
   useEffect(() => {
     const initializeChat = async () => {
@@ -389,12 +431,33 @@ const Chat = () => {
       const newUserId = generateUUID();
       setUserId(newUserId);
 
+      // Wait for Turnstile token (with timeout)
+      const maxWaitTime = 10000; // 10 seconds
+      const startTime = Date.now();
+
+      while (!turnstileToken && Date.now() - startTime < maxWaitTime) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      if (!turnstileToken) {
+        console.error('Failed to get Turnstile token');
+        addMessage('error', 'Security verification failed. Please refresh the page.');
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        // Fetch token
+        // Fetch token with Turnstile verification
         const response = await fetch(
           `${chat.apiUrl}/token?userid=${encodeURIComponent(newUserId)}`,
           {
             method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              captcha: turnstileToken,
+            }),
           }
         );
 
@@ -417,40 +480,61 @@ const Chat = () => {
       }
     };
 
-    initializeChat();
+    // Only initialize when Turnstile is ready
+    if (turnstileToken) {
+      initializeChat();
+    }
 
     // Cleanup on unmount
     return () => {
-      if (ws) {
-        ws.close();
-      }
+      // Cleanup handled by the WebSocket useEffect
     };
-  }, []);
+  }, [turnstileToken]);
 
   // Connect WebSocket when token is available
   useEffect(() => {
     if (!token || !userId) return;
 
-    let websocket = null;
-    let retryTimeout = null;
-
     const connectWebSocket = () => {
+      // Close and cleanup any existing connection first
+      if (wsRef.current) {
+        try {
+          wsRef.current.onopen = null;
+          wsRef.current.onmessage = null;
+          wsRef.current.onerror = null;
+          wsRef.current.onclose = null;
+          if (wsRef.current.readyState === WebSocket.OPEN ||
+              wsRef.current.readyState === WebSocket.CONNECTING) {
+            wsRef.current.close();
+          }
+        } catch (e) {
+          console.error('Error closing existing connection:', e);
+        }
+        wsRef.current = null;
+      }
+
       const fullUrl = `${chat.wsUrl}?token=${encodeURIComponent(
         token
       )}&userid=${encodeURIComponent(userId)}`;
 
       try {
-        websocket = new WebSocket(fullUrl);
+        const websocket = new WebSocket(fullUrl);
+        wsRef.current = websocket;
 
         websocket.onopen = () => {
-          setConnected(true);
-          setConnectionFailed(false);
-          setErrorMessage(''); // Clear any error messages
-          setWs(websocket);
-          retryCountRef.current = 0; // Reset retry count on successful connection
+          // Verify this is still the current websocket
+          if (wsRef.current === websocket) {
+            setConnected(true);
+            setConnectionFailed(false);
+            setErrorMessage(''); // Clear any error messages
+            retryCountRef.current = 0; // Reset retry count on successful connection
+          }
         };
 
         websocket.onmessage = (event) => {
+          // Verify this is still the current websocket
+          if (wsRef.current !== websocket) return;
+
           try {
             const data = JSON.parse(event.data);
 
@@ -470,21 +554,24 @@ const Chat = () => {
         };
 
         websocket.onclose = (event) => {
-          setConnected(false);
-          setWs(null);
+          // Only process if this is still the current websocket
+          if (wsRef.current === websocket) {
+            setConnected(false);
+            wsRef.current = null;
 
-          // Only retry if connection was not successful and we haven't exceeded max retries
-          if (!event.wasClean && retryCountRef.current < maxRetries) {
-            const delay = Math.pow(2, retryCountRef.current) * 1000; // Exponential backoff: 1s, 2s, 4s
-            console.log(`Retrying connection... Attempt ${retryCountRef.current + 1}/${maxRetries}`);
+            // Only retry if connection was not successful and we haven't exceeded max retries
+            if (!event.wasClean && retryCountRef.current < maxRetries) {
+              const delay = Math.pow(2, retryCountRef.current) * 1000; // Exponential backoff: 1s, 2s, 4s
+              console.log(`Retrying connection... Attempt ${retryCountRef.current + 1}/${maxRetries}`);
 
-            retryTimeout = setTimeout(() => {
-              retryCountRef.current += 1;
-              connectWebSocket();
-            }, delay);
-          } else if (retryCountRef.current >= maxRetries) {
-            setConnectionFailed(true);
-            addMessage('error', 'Connection to the Matrix lost. All retry attempts exhausted.');
+              retryTimeoutRef.current = setTimeout(() => {
+                retryCountRef.current += 1;
+                connectWebSocket();
+              }, delay);
+            } else if (retryCountRef.current >= maxRetries) {
+              setConnectionFailed(true);
+              addMessage('error', 'Connection to the Matrix lost. All retry attempts exhausted.');
+            }
           }
         };
       } catch (e) {
@@ -493,7 +580,7 @@ const Chat = () => {
         // Retry on exception
         if (retryCountRef.current < maxRetries) {
           const delay = Math.pow(2, retryCountRef.current) * 1000;
-          retryTimeout = setTimeout(() => {
+          retryTimeoutRef.current = setTimeout(() => {
             retryCountRef.current += 1;
             connectWebSocket();
           }, delay);
@@ -512,11 +599,24 @@ const Chat = () => {
 
     // Cleanup
     return () => {
-      if (retryTimeout) {
-        clearTimeout(retryTimeout);
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
       }
-      if (websocket && websocket.readyState === WebSocket.OPEN) {
-        websocket.close();
+      if (wsRef.current) {
+        try {
+          wsRef.current.onopen = null;
+          wsRef.current.onmessage = null;
+          wsRef.current.onerror = null;
+          wsRef.current.onclose = null;
+          if (wsRef.current.readyState === WebSocket.OPEN ||
+              wsRef.current.readyState === WebSocket.CONNECTING) {
+            wsRef.current.close();
+          }
+        } catch (e) {
+          console.error('Error during cleanup:', e);
+        }
+        wsRef.current = null;
       }
     };
   }, [token, userId]);
@@ -534,7 +634,7 @@ const Chat = () => {
 
     if (!content) return;
 
-    if (!ws || ws.readyState !== WebSocket.OPEN) {
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
       addMessage('error', 'Disconnected from the Matrix. Cannot transmit.');
       return;
     }
@@ -546,7 +646,7 @@ const Chat = () => {
     };
 
     try {
-      ws.send(JSON.stringify(message));
+      wsRef.current.send(JSON.stringify(message));
       addMessage('sent', content);
       setInputValue('');
     } catch (e) {
@@ -563,13 +663,18 @@ const Chat = () => {
   };
 
   const handleRetry = () => {
-    // Close existing connection if any
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.close();
+    // Clear any pending retry timeouts
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
     }
+
+    // Reset retry count
     retryCountRef.current = 0;
     setConnectionFailed(false);
     setErrorMessage(''); // Clear error message when retrying
+
+    // Trigger a new connection (connectWebSocket will handle closing the old one)
     if (connectWebSocketRef.current) {
       connectWebSocketRef.current();
     }
@@ -587,6 +692,8 @@ const Chat = () => {
       <StyledTooltip>
         AI responses may not be accurate. This is just a fun project!
       </StyledTooltip>
+      {/* Hidden Turnstile widget */}
+      <div ref={turnstileRef} style={{ display: 'none' }} />
       <StyledMessagesArea ref={messagesAreaRef}>
         {errorMessage ? (
           <StyledEmptyState $isError={true}>
