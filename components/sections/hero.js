@@ -158,13 +158,14 @@ const Hero = () => {
       </p>
     </>
   );
-  const five = (
-    <a className="email-link" href="mailto:sahin@sahinakkaya.dev" target="_blank" rel="noreferrer">
-      Get In Touch
-    </a>
-  );
+  // const five = (
+  //   <a className="email-link" href="mailto:sahin@sahinakkaya.dev" target="_blank" rel="noreferrer">
+  //     Get In Touch
+  //   </a>
+  // );
 
-  const items = [one, two, three, four, five];
+
+  const items = [one, two, three, four];
 
   return (
     <StyledHeroSection>
@@ -184,10 +185,10 @@ const Hero = () => {
             ))}
         </TransitionGroup>
       )}
-      <div className="hero-chat-wrapper">
-        <h3>Talk to my Digital Copy — the one who escaped the Matrix.</h3>
-        <Chat />
-      </div>
+        <div className="hero-chat-wrapper">
+          <h3>Talk to my digital copy — the one who escaped the Matrix.</h3>
+          <Chat />
+        </div>
     </StyledHeroSection>
   );
 };
