@@ -90,6 +90,6 @@ jobs:
           -H "Content-Type: application/json" \
           -d '{"package": "portfolio"}'
       env:
-        BODY: '{"package": "portfolio", "tag": "${{ steps.meta.outputs.tags }}", "sha": "${{ github.sha }}"}'
+        BODY: '{"package": "portfolio"}'
         APP_KEY: ${{ secrets.APP_KEY }}
 
