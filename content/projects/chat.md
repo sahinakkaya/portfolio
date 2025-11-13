@@ -1,7 +1,7 @@
 ---
 date: '2'
 title: 'AI Chat Bot'
-github: null
+github: https://github.com/sahinakkaya/chatbot
 external: 'https://sahinakkaya.dev'
 image: '/content/projects/chat.png'
 tech:
