@@ -1,5 +1,5 @@
 ---
-date: '6'
+date: '7'
 title: 'My precious rice'
 github: 'https://github.com/sahinakkaya/dotfiles/tree/old-dots'
 external: null
