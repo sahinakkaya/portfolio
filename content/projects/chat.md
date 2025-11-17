@@ -12,4 +12,4 @@ tech:
 showInProjects: true
 ---
 
-A chat bot built with Python microservices, featuring a WebSocket server for real-time communication, an AI consumer that processes messages via Kafka and OpenAI, and a relay service that distributes responses through Redis pub/sub. Scroll to the start of the page to try it live.
+A chatbot built using a Python-based microservices architecture, featuring a WebSocket server for real-time interaction, an AI processing service that handles messages through Kafka and OpenAI with RAG integration, and a relay component that broadcasts responses using Redis pub/sub. Scroll to the top of the page to try it live.
